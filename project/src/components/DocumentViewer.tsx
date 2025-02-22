@@ -132,67 +132,23 @@ console.log(doc);
     }
   };
 
-  // const handleDownload = async (doc: Document) => {
-  //   if (!doc.fileUrl && !doc.imageUrl) {
-  //     alert('No file available for download');
-  //     return;
-  //   }
-
-  //   setDownloadLoading(true);
-  //   try {
-  //     let downloadUrl;
-  //     let filename;
-
-  //     if (doc.fileType === 'image' && doc.imageUrl) {
-  //       // For images, use the direct imageUrl
-  //       downloadUrl = doc.imageUrl;
-  //       filename = `${doc.title || 'image'}.${doc.imageUrl.split('.').pop()}`;
-  //     } else {
-  //       // For other files, use Firebase Storage
-  //       const storagePath = doc.fileUrl.split('/o/')[1]?.split('?')[0];
-  //       if (!storagePath) throw new Error('Invalid storage path');
-  //       const decodedPath = decodeURIComponent(storagePath);
-  //       const storageRef = ref(storage, decodedPath);
-  //       downloadUrl = await getDownloadURL(storageRef);
-  //       filename = decodedPath.split('/').pop() || 'document';
-  //     }
-
-  //     // Create a temporary anchor element to trigger download
-  //     const link = document.createElement('a');
-  //     console.log(link);
-      
-  //     link.href = downloadUrl;
-  //     link.download = "filename"; // Set the download attribute
-  //     // link.target = '_blank'; // Open in new tab
-  //     // link.rel = 'noopener noreferrer'; // Security best practice
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     document.body.removeChild(link);
-  //   } catch (err) {
-  //     console.error('Error downloading document:', err);
-  //     alert('Error downloading document. Please try again.');
-  //   } finally {
-  //     setDownloadLoading(false);
-  //   }
-  // };
-
-  // Filter documents by search, date, tags
-  
   const handleDownload = async (doc: Document) => {
     if (!doc.fileUrl && !doc.imageUrl) {
       alert('No file available for download');
       return;
     }
-  
+
     setDownloadLoading(true);
     try {
-      let downloadUrl: string;
-      let filename: string;
-  
+      let downloadUrl;
+      let filename;
+
       if (doc.fileType === 'image' && doc.imageUrl) {
+        // For images, use the direct imageUrl
         downloadUrl = doc.imageUrl;
         filename = `${doc.title || 'image'}.${doc.imageUrl.split('.').pop()}`;
       } else {
+        // For other files, use Firebase Storage
         const storagePath = doc.fileUrl.split('/o/')[1]?.split('?')[0];
         if (!storagePath) throw new Error('Invalid storage path');
         const decodedPath = decodeURIComponent(storagePath);
@@ -200,35 +156,22 @@ console.log(doc);
         downloadUrl = await getDownloadURL(storageRef);
         filename = decodedPath.split('/').pop() || 'document';
       }
-  
-      // Debug logging
-      console.log('Download URL:', downloadUrl);
-      console.log('Filename:', filename);
-  
-      // Fetch the file as a blob
-      const response = await fetch(downloadUrl);
-      // const response = await fetch(downloadUrl, { mode: 'no-cors' });
-      console.log(response);
+
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = 'document-image.jpg'; 
+      a.click();
+      // Create a temporary anchor element to trigger download
+      // const link = document.createElement('a');
+      // console.log(link);
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const blob = await response.blob();
-  
-      // Create a blob URL
-      const blobUrl = window.URL.createObjectURL(blob);
-  
-      // Create and trigger download
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = filename;
-      link.rel = 'noopener noreferrer'; // For security
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-  
-      // Delay revoking the blob URL to ensure the download has started
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
+      // link.href = downloadUrl;
+      // link.download = "filename"; // Set the download attribute
+      // // link.target = '_blank'; // Open in new tab
+      // // link.rel = 'noopener noreferrer'; // Security best practice
+      // document.body.appendChild(link);
+      // link.click();
+      // document.body.removeChild(link);
     } catch (err) {
       console.error('Error downloading document:', err);
       alert('Error downloading document. Please try again.');
@@ -236,6 +179,67 @@ console.log(doc);
       setDownloadLoading(false);
     }
   };
+
+  // Filter documents by search, date, tags
+  
+  // const handleDownload = async (doc: Document) => {
+  //   if (!doc.fileUrl && !doc.imageUrl) {
+  //     alert('No file available for download');
+  //     return;
+  //   }
+  
+  //   setDownloadLoading(true);
+  //   try {
+  //     let downloadUrl: string;
+  //     let filename: string;
+  
+  //     if (doc.fileType === 'image' && doc.imageUrl) {
+  //       downloadUrl = doc.imageUrl;
+  //       filename = `${doc.title || 'image'}.${doc.imageUrl.split('.').pop()}`;
+  //     } else {
+  //       const storagePath = doc.fileUrl.split('/o/')[1]?.split('?')[0];
+  //       if (!storagePath) throw new Error('Invalid storage path');
+  //       const decodedPath = decodeURIComponent(storagePath);
+  //       const storageRef = ref(storage, decodedPath);
+  //       downloadUrl = await getDownloadURL(storageRef);
+  //       filename = decodedPath.split('/').pop() || 'document';
+  //     }
+  
+  //     // Debug logging
+  //     console.log('Download URL:', downloadUrl);
+  //     console.log('Filename:', filename);
+  
+  //     // Fetch the file as a blob
+  //     const response = await fetch(downloadUrl);
+  //     // const response = await fetch(downloadUrl, { mode: 'no-cors' });
+  //     console.log(response);
+      
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+  //     const blob = await response.blob();
+  
+  //     // Create a blob URL
+  //     const blobUrl = window.URL.createObjectURL(blob);
+  
+  //     // Create and trigger download
+  //     const link = document.createElement('a');
+  //     link.href = blobUrl;
+  //     link.download = filename;
+  //     // link.rel = 'noopener noreferrer'; // For security
+  //     // document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  
+  //     // Delay revoking the blob URL to ensure the download has started
+  //     setTimeout(() => window.URL.revokeObjectURL(blobUrl), 100);
+  //   } catch (err) {
+  //     console.error('Error downloading document:', err);
+  //     alert('Error downloading document. Please try again.');
+  //   } finally {
+  //     setDownloadLoading(false);
+  //   }
+  // };
   
   
   const filteredDocs = documents.filter((doc) => {
